@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+       @import url(https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,700);
+
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Open Sans', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-form {
+    background: none;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 6px 0 10px rgba(255, 254, 254, 0.3);
+    width: 300px;
+    position: relative;
+    z-index: 1;
+}
+
+.login-text {
+    color: #5a636a;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.login-username, .login-password {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    color: white; 
+    background: rgba(0, 0, 0, 0.3); 
+    transition:250ms;
+     background : ease-in;
+}
+
+.login-username:focus, .login-password:focus {
+    background: rgba(0, 0, 0, 0.5);
+    outline: auto;
+}
+
+.login-submit {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: #2c343c;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition:  250ms;
+    background:  ease-in;
+}
+
+.login-submit:hover {
+    background: #040709;
+}
+
+.login-forgot-pass {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #f7f9fb;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.login-forgot-pass:hover {
+    text-decoration: underline;
+}
+
+[class*=underlay] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+}
+
+.underlay-photo {
+    background: url('https://31.media.tumblr.com/41c01e3f366d61793e5a3df70e46b462/tumblr_n4vc8sDHsd1st5lhmo1_1280.jpg') no-repeat center center;
+    background-size: cover;
+    filter: grayscale(70%);
+    animation: hue-rotate 5s infinite;
+}
+
+.underlay-black {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+@keyframes hue-rotate {
+    from {
+        filter: grayscale(30%) hue-rotate(0deg);
+    }
+    to {
+        filter: grayscale(30%) hue-rotate(360deg);
+    }
+}
+
+.password-toggle{
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 64%;
+    transform: translateY(-50%);
+    color: white;
+}
+</style>
+    </style>
+</head>
+<body>
+
+    <div class="underlay-photo"></div>
+    <div class="underlay-black"></div>
+
+    <form class="login-form" onsubmit="validateForm(event)">
+        <p class="login-text">
+            <span class="fa-stack fa-lg">
+            <i class="fa fa-circle fa-stack-2x" style="color: #2c343c;"></i>
+            <i class="fa fa-lock fa-stack-1x" style="color: white;"></i>
+         </span>
+    Login
+    </p>
+    <input type="email" id="username"  class ="login-username" required placeholder="Email"/>
+    <input type="password"id= "password" class="login-password" required placeholder="Password"/>
+    <span class="password-toggle" onclick="PasswordVisibility()">
+        <i id="eyeIcon" class="fa fa-eye-slash"></i>
+    </span>
+    <input type="submit" class="login-submit" value="Log in"/>
+    <a href="#" class="login-forgot-pass">Forgot PAssword?  weeeeee </a>
+    </form>
+
+    <script>
+           function validateForm(event){
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            console.log('Username:', username);
+            console.log('Password:', password);
+
+
+            if (username === 'manuelwilfrid123@gmail.com' && password === '1234567'){
+               localStorage.setItem('isLoggedIn', 'true'); 
+               window.location.href = 'ano.html';
+                
+
+            }else
+            {
+                console.log('Invalid credentials');
+                alert('Invalid username or password. Please try again!');
+            }
+        }
+
+        function PasswordVisibility(){
+
+            const passwordField = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if(passwordField.type === 'password'){
+                 passwordField.type = 'text';
+                 eyeIcon.classList.remove('fa-eye-slash');
+                 eyeIcon.classList.add('fa-eye');
+
+            }else{
+                passwordField.type = 'password';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            }       
+     }
+    </script>
+    
+</body>
+</html>
