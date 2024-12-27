@@ -44,15 +44,6 @@
                     </a>
                 </li>
                 <li class="list">
-                    <a href="#" onclick="showProfessionalRegistration()">
-                        <span class="icon">
-                            <ion-icon name="person-add"></ion-icon>
-                        </span>
-                        <span class="title"> Register Admin</span>
-                        <span class="tooltip"> Register Admin</span>
-                    </a>
-                </li>
-                <li class="list">
                     <a href="logadmin.html" id="logoutButton">
                         <span class="icon">
                             <ion-icon name="log-out-outline"></ion-icon>
@@ -88,9 +79,10 @@
             </section>
 
             <section id="searchSection" style="display: none;">
-                <h2 Search professionals></h2>
-                <input type="text" id="searchInput" placeholder="Search by name or address..." oninput="-searchProfessionals()">            </section>
-                     <table>
+                <h2>Search professionals</h2>
+                <input type="text" id="searchInput" placeholder="Search by name or address..."  style="position: relative; margin-left: -110px ;" >     
+                   </section>
+                     <table id="searchResultsTable" style="display: none;">
                         <thead>
                             <tr>
                             <th>Logo</th>
@@ -101,11 +93,10 @@
                             <th>Phone number</th>
                             <th>Email</th>
                             <th>Actions</th>
-
                             </tr>
                         </thead>
                         <tbody id="searchTableBody">
-
+                            <!-- Search resullts written here-->
                         </tbody>
                      </table>
                      </section>
@@ -132,7 +123,7 @@
                         <option value="Market">Market</option>
                     </select>
                     <label for="Region">Region</label>
-                    <select id="Region" required >
+                    <select id="Region" required onchange="updateDepartments()" >
                         <option value="">Select Region</option>
                         <option value="Littoral">Littoral</option>
                         <option value="Center">Center</option>
@@ -145,24 +136,22 @@
                         <option value="Far-North">Far-North</option>
                     </select>
                     <label for="Department">Department</label>
-                    <select id="Department" required onchange="updateDepartments()">
+                    <select id="Department" required onchange="updateDistricts()">
                         <option value="">Select Department</option>
                     </select>
 
-                    <label for="District"> District</label>
-                    <select id="District" required onchange="updateDistricts()">
+                    <label for="District">District</label>
+                    <select id="District" required onchange="updateNeighborhoods()">
                         <option value="">Select District</option>
+                      
                     </select>
 
-                    <label for="neighborhood"> neighborhood</label>
-                    <select id="neighborhood" required onchange="updateNeighborhoods">
-                        <option value="">Select neighborhood</option>
+                    <label for="neighborhood">Neighborhood</label>
+                    <select id="neighborhood" required >
+                        <option value=""> select neighborhood</option>
+                      
                     </select>
 
-                    <label for="SpecificLocation"> Specific location</label>
-                    <select id="SpecificLocation" required>
-                        <option value="">Select District</option>
-                    </select>
 
                     <label for="businessActivity">Business Activity:</label>
                     <textarea id="businessActivity" required></textarea>
@@ -188,58 +177,82 @@
         if(localStorage.getItem('isLoggedIn') !== 'true'){
             window.location.href = 'logadmin.html';
         }
-        showDashboard();
+
+        loadProfessionalsFromStorage();
+        
+        document.getElementById('professionalForm').onsubmit = function(event) {
+        event.preventDefault(); 
+        addProfessional();
+
+}
+        document.getElementById('searchInput').addEventListener('keypress',function(event){
+              if (event.key=== 'Enter'){
+        searchProfessionals();
+           }
+              });
         });
-       document.getElementById('logoutButton').onclick = function(event){
+       
+        
+
+      
+     let navigation = document.querySelector('.navigation');
+     let toggle = document.querySelector('.toggle');   
+     let professionals = []; 
+     let currentEditIndex = -1; 
+
+ function loadProfessionalsFromStorage(){
+            const storedProfessionals = localStorage.getItem('professionals');
+            if (storedProfessionals){
+                professionals = JSON.parse(storedProfessionals);
+                displayProfessionals();
+            }
+        }
+
+function saveProfessionalsToStorage(){
+            localStorage.setItem('professionals', JSON.stringify(professionals));
+        } 
+        
+        document.getElementById('logoutButton').onclick = function(event){
         event.preventDefault();
         localStorage.removeItem('isLoggedIn');
         window.location.href = 'logadmin.html';
     }
-let navigation = document.querySelector('.navigation');
-let toggle = document.querySelector('.toggle');
-let professionals = []; 
-let currentEditIndex = -1; 
 
-
-toggle.onclick = function() {
+    toggle.onclick = function() {
     navigation.classList.toggle('active');
 }
-document.getElementById('logoutBUtton').onclick = function(event){
-            event.preventDefault();
-            window.location.href = 'logadmin.html';
-        }; 
+
 function setActiveSection(section) {
-   
-    document.querySelectorAll('.navigation ul li').forEach(item => {
-        item.classList.remove('active');
+   document.querySelectorAll('.navigation ul li').forEach(item => {
+    item.classList.remove('active');
     });
     section.classList.add('active');
 }
-
+function showDashboard() {
+    document.getElementById('professionalModal').style.display = 'none';
+    document.getElementById('professionalList').style.display = 'block';
+    document.getElementById('searchSection').style.display = 'none';
+    displayProfessionals(); // Refresh the list when showing the dashboard
+    setActiveSection(document.querySelector('.navigation ul li:first-child'));
+    
+}function showSearch(){
+    document.getElementById('professionalModal').style.display = 'none';
+    document.getElementById('professionalList').style.display = 'none';
+    document.getElementById('searchSection').style.display = 'block';
+    setActiveSection(document.querySelector('.navigation ul li:nth-child(2)'));
+}
 function showRegistrationForm() {
     clearForm();
     document.getElementById('professionalModal').style.display = 'block';
     document.getElementById('professionalList').style.display = 'none';
-    setActiveSection(document.querySelector('.navigation ul li:nth-child(3)')); // Set active for "Register Professional"
-}
-
-function showDashboard() {
-    document.getElementById('professionalModal').style.display = 'none';
-    document.getElementById('professionalList').style.display = 'block';
-    displayProfessionals(); // Refresh the list when showing the dashboard
-    setActiveSection(document.querySelector('.navigation ul li:first-child')); // Set active for "Dashboard"
-}
-
-function showSearch(){
-    document.getElementsById('professionalModal').style.display = 'none';
-    document.getElementsById('professionalList').style.display = 'none';
-    document.getElementsById('searchSection').style.display = 'block';
-    setActiveSection(document.querySelector('.navigation ul li:nth-child(2)'));
+    document.getElementById('searchSection').style.display = 'none';
+    setActiveSection(document.querySelector('.navigation ul li:nth-child(3)')); 
 }
 
 document.querySelectorAll('.list a').forEach((link, index) => {
     link.addEventListener('click', function(event) {
-        event.preventDefault(); //prevemts default anchor behavior
+        event.preventDefault(); //prevents default anchor behavior
+        document.getElementById('searchResultTable').style.display = 'none';
         if (index === 0) { 
             showDashboard();
         } else if (index === 1) { 
@@ -250,11 +263,7 @@ document.querySelectorAll('.list a').forEach((link, index) => {
       
     });
 });
-
-document.getElementById('professionalForm').onsubmit = function(event) {
-    event.preventDefault(); 
-
-    // Get form values
+// Get form values
     const logo = document.getElementById('logo').value;
     const name = document.getElementById('name').value;
     const sector = document.getElementById('sector').value;
@@ -267,18 +276,7 @@ document.getElementById('professionalForm').onsubmit = function(event) {
     const neighborhood = document.getElementById('neighborhood').value;
     const address = `${Region}, ${Department}, ${District}, ${neighborhood}`;
 
-    if (currentEditIndex > -1) {
-        professionals[currentEditIndex] = {
-            logo,
-            name,
-            sector,
-            businessActivity,
-            phone,
-            email,
-            address,
-        };
-        currentEditIndex = -1; 
-    } else {
+   
         professionals.push({
             logo,
             name,
@@ -288,12 +286,12 @@ document.getElementById('professionalForm').onsubmit = function(event) {
             email,
             address,
         });
-    }
+    
 
     clearForm();
     document.getElementById('professionalModal').style.display = 'none'; 
     displayProfessionals(); 
-}
+
 
 function clearForm() {
     document.getElementById('logo').value = '';
@@ -308,17 +306,25 @@ function clearForm() {
     document.getElementById('neighborhood').value = '';
 }
 
+
 function searchProfessionals(){
 
-    const searchInput = document.getElementById('searchInput').value.toLowercase();
-    const searchResults = professionals.filter(prof => prof.name.toLowercase().includes(searchInput)|| prof.address.toLowercase().includes(searchInput));
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const searchResults = professionals.filter(prof => 
+     prof.name.toLowerCase().includes(searchInput)||
+     prof.address.toLowerCase().includes(searchInput));
     displaySearchResults(searchResults);
+    document.getElementById('professionalList').style.display = 'block  ';
+    document.getElementById('searchResultTable').style.display = 'table';
 }
 
-function displaySearchResults(){
+function displaySearchResults(results){
     const searchTableBody = document.getElementById('searchTableBody');
     searchTableBody.innerHTML = '';
-    result.forEach((prof, index)=>{
+    if (results.length === 0){
+        searchTableBody.innerHTML = '<tr><td> colspan="8">No results found.</td></tr>';
+    }
+    results.forEach((prof, index) => {
         const newRow = searchTableBody.insertRow();
                 newRow.innerHTML = `
                     <td><img src="${prof.logo}" alt="Logo" width="50"></td>
@@ -344,23 +350,23 @@ function closeModal() {
 
 function updateDepartments(){
     const Region = document.getElementById('Region').value;
-    const Department = document.getElementById('Department');
-    Department.innerHTML = '<option value = >Select Department</option>';
+    const departmentSelect = document.getElementById('Department');
+    departmentSelect.innerHTML = '<option value = "">Select Department</option>';
 
     const departments = {
-                'Littoral': ['Department1', 'Department2'],
-                'Center': ['Department3', 'Department4'],
-                'South-West': ['Department5', 'Department6'],
-                'West': ['Department7', 'Department8'],
-                'North-west': ['Department9', 'Department10'],
-                'Adamawa': ['Department11', 'Department12'],
-                'East': ['Department13', 'Department14'],
-                'South': ['Department15', 'Department16'],
-                'Far-North': ['Department17', 'Department18'],
+                'Littoral': ['Wouri', 'Sanaga-Maritime','Littoral'],
+                'Center': ['Mfoundi', 'Mbam-et-Inoubou', 'Nyong-et-Kala'],
+                'South-West': ['Fako', 'Southwest','Lebanian'],
+                'West': ['Meno', 'Noun','Haut-Nkam'],
+                'North-west': ['Mezam', 'Boyo','Donga-Mantung'],
+                'Adamawa': ['Vina', 'Djerem','Nyong-et-Kella'],
+                'East': ['Bertoua','Kadey', 'Lom-et-Djerem'],
+                'South': ['Dja-et-Lobo', 'Mintom','Ocean'],
+                'Far-North': ['Logone-et-Chari','Mayo-Sava', 'Mayo-Kani'],
 };
-if (neighborhoods[district]) {
-                neighborhoods[district].forEach(neighborhood => {
-                    neighborhoodSelect.innerHTML += `<option value="${neighborhood}">${neighborhood}</option>`;
+if (departments[Region]) {
+    departments[Region].forEach(department => {
+        departmentSelect.innerHTML += `<option value="${department}">${department}</option>`;
                 });
             }
         }
@@ -371,15 +377,26 @@ if (neighborhoods[district]) {
             districtSelect.innerHTML = '<option value="">Select District</option>'; // Reset options
 
             const districts = {
-                'Department1': ['District1', 'District2'],
-                'Department3': ['District3', 'District4'],
-                'Department5': ['District5', 'District6'],
-                'Department7': ['District7', 'District8'],
-                'Department9': ['District9', 'District10'],
-                'Department11': ['District11', 'District12'],
-                'Department13': ['District13', 'District14'],
-                'Department15': ['District15', 'District16'],
-                'Department17': ['District17', 'District18'],
+                'Wouri': ['Douala', 'Bonaberi'],
+                'Sanaga-Maritime': ['Edea', 'Sangmelima'],
+                'Mfoundi': ['Yaounde', 'Essos'],
+                'Mbam-et-Inoubou': ['Bafia', 'Nkolbisson'],
+                'Fako':['Limbe','Buea'],
+                'Lebialem': ['Dschang'],
+                'Meno': ['Dinguiraye'],
+                'Noun': ['Foumban'],
+                'Mezam': ['Bamenda'],
+                'Boyo': ['Nkambe'],
+                'Donga-Mantung': ['Nwa'],
+                'Vina': ['Ngaoundéré'],
+                'Djerem': ['Djohong'],
+                'Kadey': ['Bertoua'],
+                'Lom-et-Djerem': ['Bertoua'],
+                'Dja-et-Lobo': ['Lobo'],
+                'Mintom': ['Mintom'],
+                'Logone-et-Chari': ['Maroua'],
+                'Mayo-Sava': ['Mokolo'],
+                'Mayo-Kani': ['Yagoua'],
             };
 
             if (districts[department]) {
@@ -395,17 +412,19 @@ if (neighborhoods[district]) {
             neighborhoodSelect.innerHTML = '<option value="">Select Neighborhood</option>'; // Reset options
 
             const neighborhoods = {
-                'District1': ['Neighborhood1', 'Neighborhood2'],
-                'District3': ['Neighborhood3', 'Neighborhood4'],
-                'District5': ['Neighborhood5', 'Neighborhood6'],
-                'District7': ['Neighborhood7', 'Neighborhood8'],
-                'District9': ['Neighborhood9', 'Neighborhood10'],
-                'District11': ['Neighborhood11', 'Neighborhood12'],
-                'District13': ['Neighborhood13', 'Neighborhood14'],
-                'District15': ['Neighborhood15', 'Neighborhood16'],
-                'District17': ['Neighborhood17', 'Neighborhood18'],
-            };
-
+        'Douala': ['Bonapriso','Makepe','New-Bell'],
+        'Bonaberi': ['Bonendale','Moutong'],
+        'Edea': ['Edea Town','Akom II'],
+        'Yaoundé': ['Biyem-Assi','Ngousso'],
+        'Limbe': ['Limbe Town','Bota' ],
+        'Bamenda': ['Up Station','Down Station'],
+        'Nkambe': [ 'Nkambe Town','Donga'],
+        'Mokolo': ['Mokolo Town','Mokolo Center'],
+        'Maroua': ['Maroua Town', 'Maroua Center'],
+        'Bertoua': ['Bertoua Town','Ngoura' ],
+        'Nanga Eboko': ['Nanga Eboko Town'],
+    };
+           
             if (neighborhoods[district]) {
                 neighborhoods[district].forEach(neighborhood => {
                     neighborhoodSelect.innerHTML += `<option value="${neighborhood}">${neighborhood}</option>`;
@@ -413,10 +432,53 @@ if (neighborhoods[district]) {
             }
         }
 
+function addProfessional(){
+    console.log("Adding professionalas =... ");
+    const logo = document.getElementById('logo').value;
+    const name = document.getElementById('name').value;
+    const sector = document.getElementById('sector').value;
+    const businessActivity = document.getElementById('businessActivity').value;
+    const phone = document.getElementById('phone').value;
+    const email= document.getElementById('email').value;
+    const Region = document.getElementById('Region').value;
+    const Department = document.getElementById('Department').value;
+    const District = document.getElementById('District').value;
+    const neighborhood = document.getElementById('neighborhood').value;
+    const address = `${Region}, ${Department}, ${District}, ${neighborhood}`;
 
+    if (currentEditIndex > -1){
+        professionals[currentEditIndex]={
+            logo,
+            name,
+            sector,
+            businessActivity,
+            phone,
+            email,
+            address,
+        };
+        currentEditIndex = -1;
+    }else{
+        professionals.push({
+            logo,
+            name,
+            sector,
+            businessActivity,
+            phone,
+            email,
+            address,
+        });
+    }
+
+    SaveProfessionalsToStorage();
+    clearForm();
+    console.log("Current professionals:", professionals);
+    displayProfessionals();
+    
+}
 function deleteProfessional(index) {
     if (confirm('Are you sure you want to delete this professional?')) {
         professionals.splice(index, 1);
+        SaveProfessionalsToStorage();
         displayProfessionals();
     }
 }
@@ -439,15 +501,18 @@ function editProfessional(index) {
         updateNeighborhoods();
         document.getElementById('neighborhood').value = addressParts[3];
 
-
+        SaveProfessionalsToStorage();
     currentEditIndex = index; // Set the index for editing
     document.getElementById('professionalModal').style.display = 'block'; // Show modal for editing
 }
 
 function displayProfessionals() {
     const tableBody = document.getElementById('professionalTableBody');
-    tableBody.innerHTML = ''; // Clear the table body
-
+    tableBody.innerHTML = ''; 
+    if (professionals.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8">No professionals found.</td></tr>';
+        return;
+    }
     professionals.forEach((prof, index) => {
         const newRow = tableBody.insertRow();
         newRow.innerHTML = `
@@ -464,6 +529,8 @@ function displayProfessionals() {
             </td>
         `;
     });
+    
+    
  }
 </script>
 </body>
