@@ -308,20 +308,27 @@ function clearForm() {
 
 
 function searchProfessionals(){
-
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
     const searchResults = professionals.filter(prof => 
      prof.name.toLowerCase().includes(searchInput)||
      prof.address.toLowerCase().includes(searchInput));
+
+     if (prof.name.toLowerCase().includes(searchInput)||prof.address.toLowerCase().includes(searchInput)) {
+        displaySearchResults(results);
+        
+     }
+
     displaySearchResults(searchResults);
-    document.getElementById('professionalList').style.display = 'block  ';
+
+    document.getElementById('professionalList').style.display = 'block';
     document.getElementById('searchResultTable').style.display = 'table';
 }
 
 function displaySearchResults(results){
     const searchTableBody = document.getElementById('searchTableBody');
     searchTableBody.innerHTML = '';
-    if (results.length === 0){
+    if 
+        (results.length === 0){
         searchTableBody.innerHTML = '<tr><td> colspan="8">No results found.</td></tr>';
     }
     results.forEach((prof, index) => {
@@ -469,7 +476,7 @@ function addProfessional(){
         });
     }
 
-    SaveProfessionalsToStorage();
+    saveProfessionalsToStorage();
     clearForm();
     console.log("Current professionals:", professionals);
     displayProfessionals();
@@ -528,9 +535,8 @@ function displayProfessionals() {
                 <button onclick="deleteProfessional(${index})">Delete</button>
             </td>
         `;
+       
     });
-    
-    
  }
 </script>
 </body>
